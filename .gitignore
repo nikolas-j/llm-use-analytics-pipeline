@@ -1,13 +1,57 @@
-# Python-generated files
+# Python
 __pycache__/
-*.py[oc]
+*.py[cod]
+*$py.class
+*.so
+.Python
 build/
+develop-eggs/
 dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
 wheels/
-*.egg-info
+*.egg-info/
+.installed.cfg
+*.egg
 
 # Virtual environments
-.venv
-
-RESEARCH.md
+venv/
+ENV/
 env/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables - never commit
+.env
+
+# Temporary data
+tmp_data/
+*.tmp
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# AWS credentials
+.aws/
+
+# All .md files temporarily ignored
+*.md

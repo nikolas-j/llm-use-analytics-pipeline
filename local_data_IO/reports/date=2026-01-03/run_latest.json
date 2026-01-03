@@ -1,0 +1,20 @@
+{
+  "date": "2026-01-03",
+  "run_timestamp": "2026-01-03T22:44:01.816885Z",
+  "storage_type": "local",
+  "input_files_count": 1,
+  "events_read": 10,
+  "events_valid": 10,
+  "events_invalid": 0,
+  "conversations_assembled": 3,
+  "conversations_classified": 3,
+  "redaction_stats": {
+    "emails_redacted": 2,
+    "phones_redacted": 1,
+    "urls_redacted": 1
+  },
+  "metrics_written": true,
+  "sanitized_written": false,
+  "duration_seconds": 0.014477252960205078,
+  "errors": []
+}
