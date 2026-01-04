@@ -3,7 +3,7 @@
   "metrics": [
     {
       "team": "Finance",
-      "task_category": "uncategorized",
+      "task_category": "Customer Comms (support/sales)",
       "conversation_count": 1,
       "total_turns": 3,
       "total_chars_user": 85,
@@ -11,7 +11,7 @@
     },
     {
       "team": "Sales",
-      "task_category": "uncategorized",
+      "task_category": "Customer Comms (support/sales)",
       "conversation_count": 1,
       "total_turns": 4,
       "total_chars_user": 117,
@@ -19,7 +19,7 @@
     },
     {
       "team": "Support",
-      "task_category": "uncategorized",
+      "task_category": "Technical Help",
       "conversation_count": 1,
       "total_turns": 3,
       "total_chars_user": 106,

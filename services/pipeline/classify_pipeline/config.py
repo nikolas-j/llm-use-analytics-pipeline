@@ -80,10 +80,44 @@ class PipelineConfig(BaseSettings):
         description="Logging level: DEBUG, INFO, WARNING, ERROR",
     )
 
+    # LLM Classification (Amazon Bedrock)
+    llm_classification: bool = Field(
+        default=True,
+        description="Enable LLM classification (set to False to bypass and save costs)",
+    )
+    bedrock_region: str = Field(
+        default="eu-north-1",
+        description="AWS region for Bedrock",
+    )
+    bedrock_model_id: str = Field(
+        default="eu.amazon.nova-micro-v1:0",
+        description="Bedrock inference profile ID (e.g., eu.amazon.nova-micro-v1:0 for EU)",
+    )
+    bedrock_connect_timeout: int = Field(
+        default=2,
+        description="Bedrock connection timeout in seconds",
+    )
+    bedrock_read_timeout: int = Field(
+        default=5,
+        description="Bedrock read timeout in seconds",
+    )
+    bedrock_max_retries: int = Field(
+        default=2,
+        description="Maximum retry attempts for Bedrock calls",
+    )
+
     def validate_s3_config(self) -> None:
         """Validate S3-specific configuration."""
         if self.storage == StorageType.S3 and not self.s3_bucket:
             raise ValueError("S3_BUCKET is required when STORAGE=s3")
+
+    def validate_bedrock_config(self) -> None:
+        """Validate Bedrock configuration when LLM classification is enabled."""
+        if self.llm_classification:
+            if not self.bedrock_region:
+                raise ValueError("BEDROCK_REGION is required when LLM_CLASSIFICATION=true")
+            if not self.bedrock_model_id:
+                raise ValueError("BEDROCK_MODEL_ID is required when LLM_CLASSIFICATION=true")
 
     def __repr__(self) -> str:
         """Safe repr that doesn't expose AWS credentials."""
@@ -113,7 +147,9 @@ def load_config() -> PipelineConfig:
         
     Raises:
         ValueError: If S3 is selected but S3_BUCKET is not provided
+        ValueError: If LLM classification is enabled but Bedrock config is missing
     """
     config = PipelineConfig()
     config.validate_s3_config()
+    config.validate_bedrock_config()
     return config

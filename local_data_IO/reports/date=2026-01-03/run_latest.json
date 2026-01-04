@@ -1,6 +1,6 @@
 {
   "date": "2026-01-03",
-  "run_timestamp": "2026-01-03T22:44:01.816885Z",
+  "run_timestamp": "2026-01-04T23:41:16.166356Z",
   "storage_type": "local",
   "input_files_count": 1,
   "events_read": 10,
@@ -14,7 +14,7 @@
     "urls_redacted": 1
   },
   "metrics_written": true,
-  "sanitized_written": false,
-  "duration_seconds": 0.014477252960205078,
+  "sanitized_written": true,
+  "duration_seconds": 5.507343053817749,
   "errors": []
 }
