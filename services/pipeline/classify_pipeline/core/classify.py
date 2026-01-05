@@ -73,7 +73,7 @@ CLASSIFICATION_TOOL = {
 # System and user prompt templates
 SYSTEM_PROMPT = "You are a strict classifier. Select exactly one label. Output only a tool call."
 
-USER_PROMPT_TEMPLATE = """Classify this snippet into one label. Snippet:
+USER_PROMPT_TEMPLATE = """Classify this LLM conversation based on user questions. Snippet:
 {snippet}"""
 
 
@@ -229,16 +229,20 @@ def _conversation_to_snippet(conversation: Conversation) -> str:
     """Convert Conversation object to a text snippet for classification.
     
     Creates a compact representation of the conversation for the classifier.
+    Extracts only user messages to save tokens and focus on user intent.
     
     Args:
         conversation: Conversation object with messages
         
     Returns:
-        Text snippet (multi-line string with role and content)
+        Text snippet (multi-line string with user messages only)
     """
     lines = []
-    # Take up to 8 messages (to keep snippet short)
-    messages = conversation.messages[:8]
+    # Extract only user messages
+    user_messages = [msg for msg in conversation.messages if msg.role == "user"]
+    
+    # Take up to 8 user messages (to keep snippet short)
+    messages = user_messages[:8]
     
     for msg in messages:
         # Truncate long messages
@@ -247,8 +251,8 @@ def _conversation_to_snippet(conversation: Conversation) -> str:
             content += "..."
         lines.append(f"{msg.role}: {content}")
     
-    if len(conversation.messages) > 8:
-        lines.append(f"... ({len(conversation.messages) - 8} more messages)")
+    if len(user_messages) > 8:
+        lines.append(f"... ({len(user_messages) - 8} more user messages)")
     
     return "\n".join(lines)
 

@@ -1,6 +1,6 @@
 {
   "date": "2026-01-03",
-  "run_timestamp": "2026-01-04T23:41:16.166356Z",
+  "run_timestamp": "2026-01-05T00:38:08.991750Z",
   "storage_type": "local",
   "input_files_count": 1,
   "events_read": 10,
@@ -9,12 +9,12 @@
   "conversations_assembled": 3,
   "conversations_classified": 3,
   "redaction_stats": {
-    "emails_redacted": 2,
+    "emails_redacted": 1,
     "phones_redacted": 1,
     "urls_redacted": 1
   },
   "metrics_written": true,
   "sanitized_written": true,
-  "duration_seconds": 5.507343053817749,
+  "duration_seconds": 5.945396184921265,
   "errors": []
 }

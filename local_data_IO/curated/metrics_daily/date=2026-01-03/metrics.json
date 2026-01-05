@@ -10,20 +10,20 @@
       "total_chars_assistant": 77
     },
     {
-      "team": "Sales",
-      "task_category": "Customer Comms (support/sales)",
+      "team": "Marketing",
+      "task_category": "Drafting/Rewriting",
       "conversation_count": 1,
-      "total_turns": 4,
-      "total_chars_user": 117,
-      "total_chars_assistant": 145
+      "total_turns": 3,
+      "total_chars_user": 209,
+      "total_chars_assistant": 110
     },
     {
       "team": "Support",
       "task_category": "Technical Help",
       "conversation_count": 1,
-      "total_turns": 3,
-      "total_chars_user": 106,
-      "total_chars_assistant": 84
+      "total_turns": 4,
+      "total_chars_user": 154,
+      "total_chars_assistant": 236
     }
   ],
   "total_conversations": 3,
