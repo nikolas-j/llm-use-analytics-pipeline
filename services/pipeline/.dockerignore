@@ -1,0 +1,25 @@
+# Docker ignore file - excludes files from build context
+# Tests and development files
+tests/
+.pytest_cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.coverage
+.coverage.*
+htmlcov/
+
+# Configuration and documentation
+*.md
+.env
+.env.*
+pyproject.toml
+
+# Git and IDE
+.git/
+.gitignore
+.vscode/
+.idea/
+*.swp
+*.swo
