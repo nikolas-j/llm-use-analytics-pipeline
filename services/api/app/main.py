@@ -1,11 +1,26 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.endpoints.v1.endpoints import router as v1_router
+from app.config import get_settings
+
+settings = get_settings()
 
 app = FastAPI(
     title="LLM Classifier API",
     description="API for retrieving classified conversation metrics and reports",
     version="1.0.0"
+)
+
+# Configure CORS
+allowed_origins = [o.strip() for o in settings.CORS_ALLOW_ORIGINS.split(",") if o.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=False,
+    allow_methods=["GET", "OPTIONS"],
+    allow_headers=["*"],
 )
 
 # Include v1 router
