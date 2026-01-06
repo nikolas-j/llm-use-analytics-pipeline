@@ -578,9 +578,8 @@ def test_conversation_to_snippet_basic(technical_conversation):
     
     snippet = _conversation_to_snippet(technical_conversation)
     
-    # Should contain role and content
+    # Should contain only user messages
     assert "user:" in snippet.lower()
-    assert "assistant:" in snippet.lower()
     assert "KeyError" in snippet
     assert "Python script" in snippet
 

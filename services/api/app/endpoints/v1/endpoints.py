@@ -1,22 +1,19 @@
-from fastapi import FastAPI, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query
 from fastapi.responses import JSONResponse
-import boto3
-from botocore.exceptions import ClientError
-import json
 from typing import Dict, Any
+import json
+from botocore.exceptions import ClientError
 
 from app.config import Settings, get_settings
 from app.schemas import DateQuery
 
-app = FastAPI(
-    title="LLM Classifier API",
-    description="API for retrieving classified conversation metrics and reports",
-    version="1.0.0"
-)
+router = APIRouter()
 
 
 def get_s3_client(settings: Settings = Depends(get_settings)):
     """Create and return S3 client with configuration from settings."""
+    import boto3
+    
     session_kwargs = {"region_name": settings.aws_region}
     
     # Use explicit credentials if provided
@@ -58,20 +55,7 @@ def fetch_s3_json(
         )
 
 
-@app.get("/")
-async def root():
-    """Root endpoint with API information."""
-    return {
-        "message": "LLM Classifier API",
-        "version": "1.0.0",
-        "endpoints": {
-            "/v1/metrics": "Get daily metrics by date",
-            "/v1/reports": "Get daily reports by date"
-        }
-    }
-
-
-@app.get("/v1/metrics", response_class=JSONResponse)
+@router.get("/metrics", response_class=JSONResponse)
 async def get_metrics(
     date: str = Query(..., description="Date in YYYY-MM-DD format"),
     settings: Settings = Depends(get_settings),
@@ -96,7 +80,7 @@ async def get_metrics(
     return fetch_s3_json(s3_client, settings.aws_s3_bucket_name, s3_key)
 
 
-@app.get("/v1/reports", response_class=JSONResponse)
+@router.get("/reports", response_class=JSONResponse)
 async def get_reports(
     date: str = Query(..., description="Date in YYYY-MM-DD format"),
     settings: Settings = Depends(get_settings),
@@ -115,13 +99,7 @@ async def get_reports(
     date_query = DateQuery(date=date)
     
     # Construct S3 key
-    s3_key = f"reports/date={date_query.date}/latest.json"
+    s3_key = f"reports/date={date_query.date}/run_latest.json"
     
     # Fetch and return data
     return fetch_s3_json(s3_client, settings.aws_s3_bucket_name, s3_key)
-
-
-@app.get("/health")
-async def health_check():
-    """Health check endpoint."""
-    return {"status": "healthy"}

@@ -12,6 +12,8 @@ This project implements a modular data pipeline that:
 5. **Aggregates** daily metrics by team and category
 6. **Outputs** curated analytics data
 
+Additionally the pipeline results are served via FastAPI.
+
 ## Quick Start
 
 ```bash

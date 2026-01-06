@@ -56,3 +56,7 @@ Thumbs.db
 
 # Notes
 RESEARCH.md
+CLI_coms.txt
+
+# AWS Job files
+run_pipeline_job.sh
