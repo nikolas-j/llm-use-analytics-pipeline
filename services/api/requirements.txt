@@ -7,3 +7,6 @@ python-dotenv==1.0.1
 pytest==8.3.4
 httpx==0.28.1
 moto==5.0.26
+
+# For AWS Lambda deployment
+mangum==0.20.0
