@@ -14,16 +14,20 @@ def get_s3_client(settings: Settings = Depends(get_settings)):
     """Create and return S3 client with configuration from settings."""
     import boto3
     
-    session_kwargs = {"region_name": settings.aws_region}
-    
-    # Use explicit credentials if provided
-    if settings.aws_access_key_id and settings.aws_secret_access_key:
-        session_kwargs.update({
-            "aws_access_key_id": settings.aws_access_key_id,
-            "aws_secret_access_key": settings.aws_secret_access_key
-        })
-    
-    return boto3.client("s3", **session_kwargs)
+    # Always set region
+    client_kwargs = {"region_name": settings.aws_region}
+
+    # If running on AWS Lambda, ALWAYS use the execution role credentials
+    return boto3.client("s3", **client_kwargs)
+
+    # Local/dev: allow explicit credentials if you want
+    #if settings.aws_access_key_id and settings.aws_secret_access_key:
+    #    client_kwargs.update({
+    #        "aws_access_key_id": settings.aws_access_key_id,
+    #        "aws_secret_access_key": settings.aws_secret_access_key
+    #    })
+    #
+    #return boto3.client("s3", **client_kwargs)
 
 
 def fetch_s3_json(

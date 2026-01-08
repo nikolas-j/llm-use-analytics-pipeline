@@ -95,7 +95,8 @@ docker run \
   llm-classifier
 ```
 
-**Run with AWS (requires AWS credentials):**
+**Run with AWS S3 (requires AWS credentials):**
+
 ```bash
 docker run -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
@@ -161,4 +162,39 @@ LOG_LEVEL=DEBUG python -m classify_pipeline.main
 
 # Enable sanitized output
 WRITE_SANITIZED=true python -m classify_pipeline.main
+```
+
+## Run on AWS ECS Fargate
+
+**1. Build and push to ECR:**
+```bash
+docker build -t llm-classifier .
+# Tag and push to your ECR repository
+```
+
+**2. Create ECS task definition:**
+- Use the container image from ECR
+- Set environment variables (STORAGE=s3, S3_BUCKET, AWS_REGION, DATE, etc.)
+- Configure memory (recommended: 2 GB) and CPU (0.5 vCPU or higher)
+
+**3. Configure IAM task role:**
+- S3 read/write access to your data bucket
+- Bedrock invoke model access (if using LLM_CLASSIFICATION=true)
+- ECS task execution role for pulling images from ECR
+
+**4. Run task via CLI:**
+```bash
+aws ecs run-task \
+  --region eu-north-1 \
+  --cluster YOUR_CLUSTER_NAME \
+  --launch-type FARGATE \
+  --task-definition bedrock-classifier-task:1 \
+  --count 1 \
+  --network-configuration "awsvpcConfiguration={subnets=[YOUR_SUBNET],securityGroups=[YOUR_SG],assignPublicIp=ENABLED}"
+```
+
+**Or use the shell script:**
+```bash
+chmod +x run_pipeline_job.sh
+./run_pipeline_job.sh
 ```

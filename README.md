@@ -1,153 +1,168 @@
-# LLM Conversation Use Case Classifier
+# LLM Use Analytics Platform
 
-Project demonstrating MLOps pipeline for classifying LLM conversation logs.
+## Executive Summary
 
-## Project Overview
+**The Challenge:** Organizations deploying LLMs across teams lack visibility into adoption patterns, use cases, and potential security risks. Without centralized monitoring, executives cannot answer critical questions: *Which teams are using AI? How are they using it? Are employees leaking sensitive information?*
 
-This project implements a modular data pipeline that:
-1. **Ingests** JSONL message event logs from conversations
-2. **Sanitizes** content by redacting sensitive information (PII)
-3. **Assembles** messages into complete conversations
-4. **Classifies** conversations into task categories
-5. **Aggregates** daily metrics by team and category
-6. **Outputs** curated analytics data
+**The Solution:** An end-to-end analytics platform that transforms raw LLM conversation logs into actionable business intelligence. This system quantifies LLM integration across the enterprise, identifies usage patterns by team and task category, and detects potential data leakage incidents—enabling data-driven decisions about AI adoption, training needs, and security policies.
 
-Additionally the pipeline results are served via FastAPI.
+## What This Project Demonstrates
 
-## Quick Start
+This is a production-grade MLOps pipeline showcasing:
 
-```bash
-# 1. Install dependencies
-cd services/pipeline
-pip install -r requirements.txt
+- **Cloud-Native ETL Architecture** - Serverless data processing on AWS using S3, ECS Fargate, and Lambda
+- **LLM Integration & Inference** - Cost-optimized classification using AWS Bedrock with prompt engineering
+- **Data Engineering** - Event stream processing, conversation assembly, PII sanitization with custom regex patterns
+- **MLOps Best Practices** - Containerized deployments, environment abstraction, comprehensive testing, automated workflows
+- **API Development** - RESTful data serving layer with FastAPI for downstream analytics
+- **Security-First Design** - Automated PII detection and redaction for cybersecurity training insights
 
-# 2. Create configuration file
-cp .env.example .env
-# (Defaults work out-of-the-box for local development)
+## Architecture Overview
 
-# 3. Run pipeline with sample data
-python -m classify_pipeline.main
+### Components
 
-# 4. View results
-cat ../../local_data_IO/curated/metrics_daily/date=2026-01-03/metrics.json
+**1. Data Pipeline (`services/pipeline`)**
+- Ingests JSONL conversation logs from S3 (`/landing/date=YYYY-MM-DD/`)
+- Sanitizes sensitive information (emails, project names, URLs) with configurable regex patterns
+- Assembles message events into complete conversations with team metadata
+- Classifies conversations using AWS Bedrock LLM inference (Nova Micro model)
+- Aggregates daily metrics by team and task category
+- Outputs curated analytics to S3 (`/curated/metrics_daily/`)
+- Generates execution reports with redaction statistics and performance metrics
+- **Deployed as:** Dockerized batch job on AWS ECS Fargate
+
+**2. REST API (`services/api`)**
+- FastAPI service exposing classified data via HTTP endpoints
+- `GET /v1/metrics?date=YYYY-MM-DD` - Daily team usage and classification metrics
+- `GET /v1/reports?date=YYYY-MM-DD` - Pipeline execution reports
+- **Deployed as:** AWS Lambda function with API Gateway trigger
+
+**3. Frontend Demo (`llm-use-frontend`)**
+- Simple web interface for visualizing LLM usage trends
+- **Deployed as:** Static site on AWS CloudFront + S3
+
+### Key Business Insights Delivered
+
+- **Team-level LLM adoption rates** - Which departments are using AI tools
+- **Task categorization** - Primary use cases (technical help, writing assistance, analysis, etc.)
+- **Usage volume metrics** - Total conversations, turns, character counts per team
+- **Security incidents** - PII leakage detection for targeted cybersecurity training
+- **Trend analysis** - Daily/weekly adoption and usage patterns
+
+## Technology Stack
+
+**Cloud & Infrastructure:**
+- AWS S3 (data lake storage)
+- AWS ECS Fargate (serverless container orchestration)
+- AWS Lambda (API serving)
+- AWS Bedrock (managed LLM inference)
+- AWS ECR (container registry)
+- AWS CloudFront (CDN)
+- Docker (containerization)
+
+**Data & ML:**
+- AWS Bedrock SDK (LLM integration)
+- Pydantic (data validation)
+- Custom NLP pipelines (PII detection, conversation assembly)
+
+**API & Web:**
+- FastAPI (REST API framework)
+- Uvicorn (ASGI server)
+- HTML/CSS/JavaScript (frontend)
+
+**DevOps:**
+- pytest (testing framework)
+- Environment-based configuration (.env)
+- Shell scripts for automated deployments
+
+## AWS Deployment Workflow
+
+### 1. Initial Setup
+- **S3 Bucket:** Create bucket with folder structure (`landing/`, `sanitized/`, `curated/`, `reports/`)
+- **IAM Roles:** 
+  - ECS Task Role: S3 read/write + Bedrock invoke permissions
+  - Lambda Execution Role: S3 read + CloudWatch Logs
+  - ECS Task Execution Role: ECR image pull
+- **Bedrock:** Enable model access (Amazon Nova Micro in eu-north-1)
+
+### 2. Pipeline Deployment (ECS Fargate)
+- Build Docker image: `docker build -f services/pipeline/Dockerfile -t llm-classifier .`
+- Push to ECR repository
+- Create ECS task definition with environment variables (S3_BUCKET, BEDROCK_REGION, etc.)
+- Configure VPC networking (subnets, security groups)
+- Run task via CLI: `aws ecs run-task --cluster <cluster> --task-definition bedrock-classifier-task`
+- Schedule with EventBridge (optional) for daily execution
+
+### 3. API Deployment (Lambda)
+- Build Lambda container: `docker build -f services/api/Dockerfile.lambda -t llm-api-lambda .`
+- Push to ECR
+- Create Lambda function from container image (512 MB memory, 30s timeout)
+- Set environment variables (S3_BUCKET, CORS_ALLOW_ORIGINS)
+- Add HTTP API Gateway trigger
+- Configure CORS for frontend domain
+
+### 4. Frontend Deployment (CloudFront)
+- Upload static files (index.html, script.js, styles.css) to S3 bucket
+- Enable static website hosting
+- Create CloudFront distribution pointing to S3
+- Update frontend API endpoint URL to Lambda/API Gateway URL
+
+### 5. Execution
+- Upload conversation logs to S3: `s3://bucket/landing/date=2026-01-08/conversations.jsonl`
+- Trigger pipeline: `./run_pipeline_job.sh` or scheduled ECS task
+- Access results via API: `https://<api-gateway-url>/v1/metrics?date=2026-01-08`
+- View dashboard: `https://<cloudfront-url>`
+
+## Project Structure
+
+```
+LLM-use-classifier/
+├── services/
+│   ├── pipeline/          # ETL pipeline (ECS Fargate)
+│   │   ├── classify_pipeline/
+│   │   ├── tests/
+│   │   ├── Dockerfile
+│   │   └── requirements.txt
+│   └── api/              # REST API (Lambda)
+│       ├── app/
+│       ├── tests/
+│       ├── Dockerfile.lambda
+│       └── requirements.txt
+├── llm-use-frontend/     # Web UI (CloudFront)
+├── local_data_IO/        # Local development data
+└── run_pipeline_job.sh   # ECS deployment script
 ```
 
-**Expected output**:
-```
-✓ Found 1 input file(s)
-✓ Parsed 10 valid events
-✓ Redactions: 4 total (emails=2, phones=1, urls=1)
-✓ Assembled 3 conversations
-✓ Classified 3 conversations
-✓ Pipeline completed successfully in 0.01s
-```
+## Design Principles & Code Quality
 
+**Modularity & Extensibility:**
+- **Clean separation of concerns** - Pipeline stages (sanitize, assemble, classify, aggregate) are independent modules
+- **Trivial to extend** - Add new pipeline steps by creating a new module and updating the main orchestration function
+- **Flexible classification logic** - Swap LLM models or classification strategies by modifying a single function in `classify_pipeline/core/classify.py`
 
-### Storage Abstraction
-```python
-class StorageIO(ABC):
-    """Storage-agnostic interface"""
-    def list_objects(prefix: str) -> list[ObjectRef]: ...
-    def open_text(key: str) -> Iterator[str]: ...
-    def write_json(key: str, data: Any): ...
-    def exists(key: str) -> bool: ...
+**Production-Ready Engineering:**
+- **Abstracted storage layer** - Single interface (`StorageIO`) for local filesystem and S3; switch environments with one environment variable
+- **API versioning** - Built-in folder structure (`endpoints/v1/`) enables versioned endpoints and easy rollbacks
+- **Testing** - Unit and integration tests with high coverage
+- **Environment-based config** - Zero code changes between local development and AWS production deployments
 
-# Implementations:
-LocalIO(base_path)      # Filesystem
-S3IO(bucket, region)    # AWS S3
-```
+## Getting Started
 
-## Configuration
+**For local development and testing:**
+- Pipeline: See [services/pipeline/QUICKSTART.md](services/pipeline/QUICKSTART.md)
+- API: See [services/api/README.md](services/api/README.md)
 
-Environment variables:
-```bash
-STORAGE=local|s3           # Backend type
-DATE=YYYY-MM-DD            # Processing date
-BASE_PATH=/path/to/data    # Local filesystem root
-S3_BUCKET=my-bucket        # S3 bucket (if storage=s3)
-AWS_REGION=us-east-1       # AWS region
-WRITE_SANITIZED=true       # Optional sanitized output
-```
+**For AWS deployment:**
+- Pipeline configuration: [services/pipeline/CONFIGURATION.md](services/pipeline/CONFIGURATION.md)
+- ECS deployment: [services/pipeline/QUICKSTART.md](services/pipeline/QUICKSTART.md#run-on-aws-ecs-fargate)
+- Lambda deployment: [services/api/README.md](services/api/README.md#deploy-to-aws-lambda)
 
-## Usage Examples
+## Use Cases
 
-### Local Development
-```bash
-# Uses .env configuration
-python -m classify_pipeline.main
-```
-
-### Custom Date
-```bash
-# Override DATE from .env
-DATE=2026-01-04 python -m classify_pipeline.main
-```
-
-### AWS S3 Backend
-```bash
-STORAGE=s3 S3_BUCKET=my-logs DATE=2026-01-03 python -m classify_pipeline.main
-```
-
-### Run Tests
-```bash
-pytest tests/ -v --cov=classify_pipeline
-```
-
-## Sample Output
-
-### Metrics (`curated/metrics_daily/date=2026-01-03/metrics.json`)
-```json
-{
-  "date": "2026-01-03",
-  "total_conversations": 3,
-  "metrics": [
-    {
-      "team": "Sales",
-      "task_category": "uncategorized",
-      "conversation_count": 1,
-      "total_turns": 4,
-      "avg_turns": 4.0,
-      "avg_chars_user": 117.0
-    }
-  ]
-}
-```
-
-### Run Report (`reports/date=2026-01-03/run_latest.json`)
-```json
-{
-  "date": "2026-01-03",
-  "storage_type": "local",
-  "events_read": 10,
-  "conversations_assembled": 3,
-  "redaction_stats": {
-    "emails_redacted": 2,
-    "phones_redacted": 1,
-    "urls_redacted": 1
-  },
-  "duration_seconds": 0.01,
-  "errors": []
-}
-```
-
-## Content Sanitization
-
-Automatically redacts PII:
-- **Emails**: `user@example.com` → `[EMAIL_REDACTED]`
-- **Phones**: `(555) 123-4567` → `[PHONE_REDACTED]`
-- **URLs**: `https://example.com` → `[URL_REDACTED]`
-
-Redaction statistics tracked in run reports.
-
-## Testing
-
-```bash
-# Run all tests
-pytest tests/
-
-# With coverage report
-pytest --cov=classify_pipeline --cov-report=html tests/
-
-# Specific test file
-pytest tests/test_redaction.py -v
-```
+This project demonstrates skills directly applicable to:
+- Building production ML/LLM pipelines for enterprise SaaS platforms
+- Designing serverless ETL workflows for analytics products
+- Integrating managed AI services (Bedrock, OpenAI) into business applications
+- Implementing data privacy and compliance features (PII detection/redaction)
+- Architecting cost-optimized cloud infrastructure for batch processing
+- Developing MLOps workflows with containerization and AWS deployment

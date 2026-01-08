@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Classifier Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>LLM Classifier API Dashboard</h1>
+            <p class="description">
+                This dashboard provides access to classified conversation metrics and reports 
+                from the LLM Classifier API. Select a date and choose which data you want to retrieve.
+            </p>
+        </header>
+
+        <main>
+            <div class="controls">
+                <div class="date-selector">
+                    <label for="date-input">Select Date:</label>
+                    <input type="date" id="date-input" value="2026-01-03">
+                </div>
+
+                <div class="button-group">
+                    <button id="metrics-btn" class="action-btn metrics-btn">
+                        Get Metrics
+                    </button>
+                    <button id="reports-btn" class="action-btn reports-btn">
+                        Get Reports
+                    </button>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-card">
+                    <h3>Metrics Endpoint</h3>
+                    <p>Retrieves daily metrics for classified conversations including usage statistics and classification breakdowns.</p>
+                </div>
+                <div class="info-card">
+                    <h3>Reports Endpoint</h3>
+                    <p>Retrieves comprehensive daily reports containing detailed analysis and summaries of conversation classifications.</p>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <div class="results-header">
+                    <h2>Results</h2>
+                    <button id="clear-btn" class="clear-btn">Clear</button>
+                </div>
+                <div id="loading" class="loading hidden">Loading...</div>
+                <div id="error" class="error hidden"></div>
+                <pre id="results" class="results-content"></pre>
+            </div>
+        </main>
+
+        <footer>
+            <p>API Base URL: <code>https://26xff2pz3i.execute-api.eu-north-1.amazonaws.com/</code></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 
 ```
 Input (JSONL)  →  Sanitize  →  Assemble  →  Classify  →  Aggregate  →  Output (JSON)
-     ↓              ↓           ↓            ↓            ↓             ↓
+     ↓              ↓           ↓            ↓            ↓
   landing/     redact PII   group by ID   LLM/rules   metrics by   curated/
                                                       team+category  reports/
 ```
@@ -33,23 +33,23 @@ Input (JSONL)  →  Sanitize  →  Assemble  →  Classify  →  Aggregate  → 
 
 ## Design Principles
 
-- **Storage Agnostic**: Core logic never imports boto3/pathlib, only uses `StorageIO` interface
+- **Storage abstraction**: Swithcin between local testing and production seamlsess. Core logic never imports boto3/pathlib, only uses `StorageIO` interface.
 - **Type Safe**: Pydantic models with validation for all data structures
 - **Config-Driven**: `.env` file controls storage backend, LLM mode, no code changes needed
-- **Testable**: Dependency injection, deterministic outputs, fast in-memory tests
+- **Testable**: Separation of concerns. Dependency injection, deterministic outputs, fast in-memory tests
 
 ## Safety
 
-- **PII Redaction**: Regex patterns redact emails, phones, URLs before classification
+- **PII Redaction**: Regex patterns redact customer set sensitive information (emails, phones, URLs) before classification
 - **Input Validation**: Invalid JSONL logged and skipped, doesn't crash pipeline
 - **Error Tracking**: All errors captured in `RunReport.errors[]`
 - **Bypass Mode**: `LLM_CLASSIFICATION=false` skips AWS calls for safe testing
 
 ## Extensibility
 
-- **Storage Backends**: Implement `StorageIO` interface (current: Local, S3)
-- **Classification**: Replace `classify_conversation()` function or change model in `.env`
-- **Metrics**: Extend `CategoryMetrics` schema, modify `aggregate_metrics()`
+- **Storage Backends**: Add custom storage via `StorageIO` interface (current: Local, S3)
+- **Classification**: Replace `classify_conversation()` function or change model in `.env` in any way to change classification logic
+- **Metrics**: Extend `CategoryMetrics` schema, modify `aggregate_metrics()` for specific final metrics
 - **Pipeline Stages**: Add new stages in `main.py` flow
 
 ## Observability
@@ -57,13 +57,3 @@ Input (JSONL)  →  Sanitize  →  Assemble  →  Classify  →  Aggregate  → 
 - **Logging**: Structured logs at INFO level for all stages
 - **Run Reports**: JSON output with counts, duration, redaction stats, errors
 - **Metrics**: Total conversations, events, invalid records, classifications
-
-## Monitoring and Alerting
-
-*(Implementation TBD)*
-
-**Planned metrics:**
-- Pipeline success/failure rate
-- Processing duration (p50, p95, p99)
-- Invalid event rate
-- LLM classification latency and errors

@@ -19,6 +19,7 @@ AWS_S3_BUCKET_NAME=your-bucket-name
 AWS_REGION=eu-north-1
 AWS_ACCESS_KEY_ID=your-key
 AWS_SECRET_ACCESS_KEY=your-secret
+CORS_ALLOW_ORIGINS=http://localhost:3000,http://localhost:8000
 ```
 
 3. Start the server:
@@ -59,4 +60,33 @@ docker run -p 8000:8000 --env-file .env llm-classifier-api
 API available at `http://localhost:8000`
 
 Interactive docs at `http://localhost:8000/docs`
+
+## Deploy to AWS Lambda
+
+1. **Build the Lambda image:**
+```bash
+docker build -f Dockerfile.lambda -t llm-classifier-api-lambda .
+```
+
+2. **Push to Amazon ECR:**
+   - Create an ECR repository
+   - Tag and push the image to ECR
+
+3. **Create Lambda function:**
+   - Create function from container image
+   - Configure environment variables (AWS_S3_BUCKET_NAME, AWS_REGION, CORS_ALLOW_ORIGINS)
+   - Set timeout to at least 30 seconds
+   - Configure memory (recommended: 512 MB or higher)
+
+4. **Configure IAM role:**
+   - Lambda execution role needs:
+     - Basic Lambda execution permissions
+     - S3 read access to your data bucket
+
+5. **Add API Gateway trigger:**
+   - Create HTTP API or REST API
+   - Configure CORS settings to match your frontend domain
+
+6. **Test the endpoint:**
+   - Use the API Gateway URL to access metrics and reports
 
