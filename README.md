@@ -9,7 +9,7 @@
 ## What This Project Demonstrates
 
 - **Cloud-Native ETL Architecture** - Serverless data processing on AWS using S3, ECS Fargate, and Lambda
-- **LLM Integration & Inference** - Classification using AWS Bedrock with prompt engineering
+- **LLM Integration & Inference** - Classification using AWS Bedrock
 - **Data Engineering** - Event stream processing, conversation assembly, PII sanitization with custom regex patterns
 - **MLOps Best Practices** - Containerized deployments, environment abstraction, testing, automated workflows
 - **API Development** - RESTful data serving layer with FastAPI for analytics
