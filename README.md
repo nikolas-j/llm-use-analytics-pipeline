@@ -1,21 +1,19 @@
 # LLM Use Analytics Platform
 
-## Executive Summary
+## Summary
 
-**The Challenge:** Organizations deploying LLMs across teams lack visibility into adoption patterns, use cases, and potential security risks. Without centralized monitoring, executives cannot answer critical questions: *Which teams are using AI? How are they using it? Are employees leaking sensitive information?*
+**The Challenge:** Organizations deploying LLMs across teams lack visibility into adoption patterns, use cases, and potential data leakage. We wish to know the answer to: *Which teams are using AI? How are they using it? For what are they using it for?*
 
-**The Solution:** An end-to-end analytics platform that transforms raw LLM conversation logs into actionable business intelligence. This system quantifies LLM integration across the enterprise, identifies usage patterns by team and task category, and detects potential data leakage incidents—enabling data-driven decisions about AI adoption, training needs, and security policies.
+**The Solution:** A simple end-to-end analytics pipeline that transforms raw LLM conversation logs into task categories. These metrics can be used as a proxy for LLM integration across the enterprise, identify usage patterns by team and task category, and detect potential data leakage.
 
 ## What This Project Demonstrates
 
-This is a production-grade MLOps pipeline showcasing:
-
 - **Cloud-Native ETL Architecture** - Serverless data processing on AWS using S3, ECS Fargate, and Lambda
-- **LLM Integration & Inference** - Cost-optimized classification using AWS Bedrock with prompt engineering
+- **LLM Integration & Inference** - Classification using AWS Bedrock with prompt engineering
 - **Data Engineering** - Event stream processing, conversation assembly, PII sanitization with custom regex patterns
-- **MLOps Best Practices** - Containerized deployments, environment abstraction, comprehensive testing, automated workflows
-- **API Development** - RESTful data serving layer with FastAPI for downstream analytics
-- **Security-First Design** - Automated PII detection and redaction for cybersecurity training insights
+- **MLOps Best Practices** - Containerized deployments, environment abstraction, testing, automated workflows
+- **API Development** - RESTful data serving layer with FastAPI for analytics
+- **Security-First Design** - Automated PII detection and redaction
 
 ## Architecture Overview
 
@@ -38,7 +36,7 @@ This is a production-grade MLOps pipeline showcasing:
 - **Deployed as:** AWS Lambda function with API Gateway trigger
 
 **3. Frontend Demo (`llm-use-frontend`)**
-- Simple web interface for visualizing LLM usage trends
+- Simple web interface to demo pipeline results
 - **Deployed as:** Static site on AWS CloudFront + S3
 
 ### Key Business Insights Delivered
@@ -100,6 +98,7 @@ This is a production-grade MLOps pipeline showcasing:
 - Set environment variables (S3_BUCKET, CORS_ALLOW_ORIGINS)
 - Add HTTP API Gateway trigger
 - Configure CORS for frontend domain
+- (Add authentication for real use)
 
 ### 4. Frontend Deployment (CloudFront)
 - Upload static files (index.html, script.js, styles.css) to S3 bucket
@@ -133,14 +132,14 @@ LLM-use-classifier/
 └── run_pipeline_job.sh   # ECS deployment script
 ```
 
-## Design Principles & Code Quality
+## Design Principles
 
 **Modularity & Extensibility:**
 - **Clean separation of concerns** - Pipeline stages (sanitize, assemble, classify, aggregate) are independent modules
 - **Trivial to extend** - Add new pipeline steps by creating a new module and updating the main orchestration function
 - **Flexible classification logic** - Swap LLM models or classification strategies by modifying a single function in `classify_pipeline/core/classify.py`
 
-**Production-Ready Engineering:**
+**Deployment-Ready:**
 - **Abstracted storage layer** - Single interface (`StorageIO`) for local filesystem and S3; switch environments with one environment variable
 - **API versioning** - Built-in folder structure (`endpoints/v1/`) enables versioned endpoints and easy rollbacks
 - **Testing** - Unit and integration tests with high coverage
@@ -159,10 +158,10 @@ LLM-use-classifier/
 
 ## Use Cases
 
-This project demonstrates skills directly applicable to:
-- Building production ML/LLM pipelines for enterprise SaaS platforms
+This project demonstrates:
+- Building ML/LLM pipelines for enterprise data pipelines
 - Designing serverless ETL workflows for analytics products
 - Integrating managed AI services (Bedrock, OpenAI) into business applications
 - Implementing data privacy and compliance features (PII detection/redaction)
-- Architecting cost-optimized cloud infrastructure for batch processing
-- Developing MLOps workflows with containerization and AWS deployment
+- Architecting pay-for-use cloud infrastructure
+- Developing simple AI/MLOps workflows with containerization and AWS deployment
